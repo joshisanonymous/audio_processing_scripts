@@ -64,7 +64,7 @@ if ($right_location -eq "n")
                         }
                 }
             # Cleans up extraneous files
-            Remove-Item *_silences.txt, normal_silence.wav, temp.noise-profile
+            Remove-Item *_silences.txt, normal_silence.$ext, temp.noise-profile
 
             # Print result messages
             get-childitem -name > directory_contents.txt
