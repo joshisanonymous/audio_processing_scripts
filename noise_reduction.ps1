@@ -32,7 +32,7 @@ else
             {
                 # Detect absolute silence
                 ffmpeg -i $recording -af silencedetect=n=0.01:d=1 -f null - > "absolute_silences.txt" 2>&1
-        
+
                 # Was there absolute silence?
                 $absolute_silence_check = get-content absolute_silences.txt
                 if ($absolute_silence_check -like "*silence_start*")
@@ -44,14 +44,14 @@ else
                     {
                         # If not, detect normal silence
                         ffmpeg -i $recording -af silencedetect=n=0.1:d=1 -f null - > "normal_silences.txt" 2>&1
-                
+
                         # Make sure some normal silence was detected
                         $normal_silence_check = get-content normal_silences.txt
                         if ($normal_silence_check -like "*silence_start*")
                             {
                                 # Store the first normal silence start time
                                 $silence_start = (select-string -path "normal_silences.txt" -pattern "silence_start: (.*)$").Matches.Groups[1].Value
-            
+
                                 # Store the first normal silence end time
                                 $silence_end = (select-string -path "normal_silences.txt" -pattern "silence_end: (.*) \| silence_duration: (.*)$").Matches.Groups[1].Value
 
@@ -75,7 +75,7 @@ else
                     }
             }
         # Cleans up extraneous files
-        Remove-Item *_silences.txt, normal_silence.$ext, temp.noise-profile
+        remove-item *_silences.txt, normal_silence.$ext, temp.noise-profile
 
         # Print result messages
         get-childitem -name > directory_contents.txt
