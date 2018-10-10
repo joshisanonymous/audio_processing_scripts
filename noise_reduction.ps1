@@ -19,7 +19,13 @@ if ($right_location -eq "n")
 else
     {
         # Prompt the user for the file extension of their recordings
-        $ext = read-host "What is the file extension of the recordings you're working with?"
+        $ext = read-host "What is the file extension of the recordings you're working with (e.g 'wav')?"
+
+        # Check the current version of PS and print a warning if it's before 5.1
+        if ("$($psversiontable.psversion.major).$($psversiontable.psversion.minor)" -lt 5.1)
+            {
+                write-host "You're using an older version of PowerShell. If the script doesn't work, try updating to at least version 5.1."
+            }
 
         # Get a list of recordings.
         $allrecordings = get-childitem -name *.$ext
