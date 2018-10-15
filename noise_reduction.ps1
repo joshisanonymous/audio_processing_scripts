@@ -44,6 +44,7 @@ else
                 if ($absolute_silence_check -like "*silence_start*")
                     {
                         # If yes, add the filename to a log.
+                        write-output "Contains aboslute silence:" >> "recordings_to_do_manually.txt"
                         $recording >> "recordings_to_do_manually.txt"
                     }
                 else
@@ -76,6 +77,7 @@ else
                         else
                             {
                                 # Add filename to log to do manually
+                                write-output "Failed to find normal silence:" >> "recordings_to_do_manually.txt"
                                 $recording >> "recordings_to_do_manually.txt"
                             }
                     }
