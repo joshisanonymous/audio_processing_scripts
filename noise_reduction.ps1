@@ -44,7 +44,7 @@ else
                 if ($absolute_silence_check -like "*silence_start*")
                     {
                         # If yes, add the filename to a log.
-                        write-output "Contains aboslute silence:" >> "recordings_to_do_manually.txt"
+                        write-output "Contains absolute silence:" >> "recordings_to_do_manually.txt"
                         $recording >> "recordings_to_do_manually.txt"
                     }
                 else
