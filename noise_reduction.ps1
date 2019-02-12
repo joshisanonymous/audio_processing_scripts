@@ -17,7 +17,7 @@
 ######################################################################################
 
 # Check dependencies
-. .\noise_reduction_dep_check.ps1
+. .\noise_reduction_dep.ps1
 
 # Prompt the user for the location of the sound files
 $dir = read-host "----`nWhere are your recordings located (e.g., `".\`" for the current directory, `"C:\Recordings\`", etc.)"
