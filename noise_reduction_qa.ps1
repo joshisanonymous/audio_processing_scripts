@@ -10,7 +10,7 @@
 # Dependencies: SoX
 
 # Check dependencies
-. .\noise_reduction_dep_check.ps1
+. .\noise_reduction_dep.ps1
 
 # Prompt the user for the location of the time_stamps_used.csv
 $dir_time_stamps = read-host "----`nWhere is time_stamps_used.csv located (e.g., `".\`" for the current directory, `"C:\Recordings\`", etc.)"
