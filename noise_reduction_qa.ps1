@@ -20,7 +20,7 @@ $dir_recordings = read-host "----`nWhere are your recordings located (e.g., `".\
 set-location -path "$dir_recordings"
 
 # Group the filenames, start time stamps, and end time stamps
-$files_and_stamps = select-string -path "${dir_time_stamps}time_stamps_used.csv" -pattern "^(.*\.\w{3,4}),(.*),(.*)$"
+$files_and_stamps = select-string -path "${dir_time_stamps}time_stamps_used.csv" -pattern "^(.*),(.*),(.*)$"
 
 # Start with the first match, which should be a filename
 $groupsindex = 1
