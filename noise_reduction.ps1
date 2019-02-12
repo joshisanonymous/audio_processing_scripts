@@ -10,31 +10,16 @@
 # the value at the end of the line, ranging from 0.0 to 1.0 where 1.0 is more        #
 # reduction and 0.0 is less.                                                         #
 #                                                                                    #
-# -Joshua McNeill (joshua.mcneill at uga.edu)                                           #
+# -Joshua McNeill (joshua.mcneill at uga.edu)                                        #
 #                                                                                    #
 # Dependencies: FFmpeg, SoX                                                          #
 #                                                                                    #
 ######################################################################################
 
-# Check the current version of PS and print a warning if it's before 5.1
-if ("$($psversiontable.psversion.major).$($psversiontable.psversion.minor)" -lt 5.1)
-  {
-  write-host "----`nYou're using an older version of PowerShell.`nIf the script fails, try updating to at least version 5.1.`n----"
-  }
+# Check dependencies
+. .\noise_reduction_dep_check.ps1
 
-# Check to see if FFmpeg is in PATH
-if (-not ($Env:Path -like "*FFmpeg*"))
-  {
-  write-host "----`nFFmpeg is either not installed or not in your PATH.`nIf this script fails, that might be why.`n----"
-  }
-
-# Check to see if SoX is in PATH
-if (-not ($Env:Path -like "*SoX*"))
-  {
-  write-host "----`nSoX is either not installed or not in your PATH.`nIf this script fails, that might be why.`n----"
-  }
-
-# Prompt the user to make sure they're set up correctly
+# Prompt the user for the location of the sound files
 $dir = read-host "----`nWhere are your recordings located (e.g., `".\`" for the current directory, `"C:\Recordings\`", etc.)"
 
 # Prompt the user for the file extension of their recordings
@@ -104,14 +89,14 @@ foreach ($recording in $allrecordings)
       continue
       }
 
-    # Trim the normal silence and save it to a new audio file
-    sox $dir$recording ${dir}normal_silence.$ext trim $silence_start =$silence_end
+    # Create a log of which time stamps for the silences that were used for the file
+    # for the purpose of quality control (i.e., listening to the silences manually
+    # to see if they were good)
+    write-output "$recording,$silence_start,$silence_end" >> "${dir}time_stamps_used.csv"
 
-    # Create noise profile from the normal silence audio file
-    sox ${dir}normal_silence.$ext -n noiseprof ${dir}temp.noise-profile
-
-    # Apply noise reduction to the recording using the noise profile
-    sox $dir$recording ${dir}cleaned_$recording noisered ${dir}temp.noise-profile 0.3
+    # Use SoX to apply noise reduction. You can comment this out and replace it
+    # with code to apply noise reduction with other software if you wish.
+    . .\noise_reduction_sox.ps1
 
     # Creates moves all the cleaned recordings to a subdirectory called Cleaned_Recordings
     move-item -path "${dir}cleaned_$recording" -destination "${dir}Cleaned_Recordings"
@@ -142,3 +127,14 @@ else
 
 # Final cleanup
 remove-item ${dir}directory_contents.txt
+
+# Prompt user about running a QA check of the silences right now
+$qa = read-host "Do you want to do a QA check for the silences that were used right now (y/n)"
+if ($qa -match "[yY]")
+  {
+  . .\noise_reduction_qa.ps1
+  }
+else
+  {
+  write-host "You can perform a QA check at any time by running the script noise_reduction_qa.ps1."
+  }
