@@ -1,6 +1,6 @@
 # This script is meant to do a quality control check on the silences that were
 # used in noise_reduction.ps1 to create noise profiles (saved in
-# time_stamps_used_for_silences.csv). It will play each silence, one by one,
+# time_stamps_used.csv). It will play each silence, one by one,
 # and ask the user to identify whether the silence was acceptable or not and
 # to add comments to each one, all of which is saved to a new csv file:
 # noise_reduction_qa_results.csv.
