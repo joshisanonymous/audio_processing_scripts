@@ -12,15 +12,21 @@
 # Check dependencies
 . .\noise_reduction_dep.ps1
 
-# Prompt the user for the location of the time_stamps_used.csv
+# Prompt the user for the location of the time_stamps_used.csv and how many files
+# that they want to check
 $dir_time_stamps = read-host "----`nWhere is time_stamps_used.csv located (e.g., `".\`" for the current directory, `"C:\Recordings\`", etc.)"
 $dir_recordings = read-host "----`nWhere are your recordings located (e.g., `".\`" for the current directory, `"C:\Recordings\`", etc.)"
+$lines = read-host "----`nHow many of the $($(get-content "${dir_time_stamps}time_stamps_used.csv").length) silences do you want to check?"
 
 # Move to the location of the recordings
 set-location -path "$dir_recordings"
 
-# Group the filenames, start time stamps, and end time stamps
-$files_and_stamps = select-string -path "${dir_time_stamps}time_stamps_used.csv" -pattern "^(.*),(.*),(.*)$"
+# Create a temp file with a random list of files the same size as $lines,
+# save the the filenames, start time stamps, and end time stamps to a variable,
+# then delete the temp file.
+get-content ${dir_time_stamps}time_stamps_used.csv | get-random -count $lines > "${dir_time_stamps}time_stamps_temp.csv"
+$files_and_stamps = select-string -path "${dir_time_stamps}time_stamps_temp.csv" -pattern "^(.*),(.*),(.*)$"
+remove-item -path "${dir_time_stamps}time_stamps_temp.csv"
 
 # Start with the first match, which should be a filename
 $groupsindex = 1
@@ -30,17 +36,37 @@ $groupsindex = 1
 # a time_stamps_checked.csv
 while ($groupsindex -lt $files_and_stamps.matches.groups.count)
   {
-  $temp_start_time = $files_and_stamps.matches.groups[$groupsindex + 1].value - 1
-  $temp_end_time = $files_and_stamps.matches.groups[$groupsindex + 2].value + 1
-  sox $files_and_stamps.matches.groups[$groupsindex].value -d trim $temp_start_time =$temp_end_time
+  # Run a loop that plays the audio currently in the parent loop at the specified
+  # time stamp loation and then ask if it was acceptable. The child loop allows
+  # the user to repeat the silence or to add time (in seconds) around the silence.DESCRIPTION
+  # $acceptability is set to "r" so that the audio plays at least once.
+  $acceptability = "r"
+  do
+    {
+    if ($acceptability -match "[rR]")
+      {
+      $temp_start_time = $files_and_stamps.matches.groups[$groupsindex + 1].value
+      $temp_end_time = $files_and_stamps.matches.groups[$groupsindex + 2].value
+      sox $files_and_stamps.matches.groups[$groupsindex].value -d trim $temp_start_time =$temp_end_time
+      }
+    elseif ($acceptability -match "[1-9]")
+      {
+      $temp_start_time = [decimal]$files_and_stamps.matches.groups[$groupsindex + 1].value - $acceptability
+      $temp_end_time = [decimal]$files_and_stamps.matches.groups[$groupsindex + 2].value + $acceptability
+      sox $files_and_stamps.matches.groups[$groupsindex].value -d trim $temp_start_time =$temp_end_time
+      }
+    $acceptability = read-host "Was this a good silence (y for yes, n for no, r for repeat, 1-9 to repeat with 1-9 seconds around the silence)"
+    }
+  until ($acceptability -match "[YnNn]")
+
+  $comment = read-host "Do you have any comments on this silence"
 
   # Save match values to variable as values so that they work right with write-output
   $file = $files_and_stamps.matches.groups[$groupsindex].value
   $start_time = $files_and_stamps.matches.groups[$groupsindex + 1].value
   $end_time = $files_and_stamps.matches.groups[$groupsindex + 2].value
 
-  $acceptability = read-host "Was this a good silence (y/n)"
-  $comment = read-host "Do you have any comments on this silence"
+  # Save the results to a csv file
   write-output "$file,$start_time,$end_time,$acceptability,`"$comment`"" >> time_stamps_checked.csv
 
   # Move to the next set of matches
