@@ -42,7 +42,7 @@ write-host "Please wait..."
 
 foreach ($recording in $allrecordings)
   {
-  # Detect normal silence
+  # Get normal silences
   ffmpeg -i $dir$recording -af silencedetect=n=${norm_thres}:d=$norm_dur -f null - > "${dir}normal_silences.txt" 2>&1
   $normal_silence_check = get-content -path "${dir}normal_silences.txt"
 
@@ -69,6 +69,8 @@ foreach ($recording in $allrecordings)
     # otherwise all matches have been checked
     while ($absolute_silence_check -like "*$silence_start*")
       {
+      # Moves on to the second normal silence time stamp, because, as per the while test,
+      # the first was an absolute silence.
       $groupsindex = $groupsindex + 2
       if ($groupsindex -lt $normal_silence_starts.matches.groups.count)
         {
@@ -77,7 +79,7 @@ foreach ($recording in $allrecordings)
         }
       else
         {
-        write-output "`"Contains only absolute silences`",$recording" >> "${dir}recordings_to_do_manually.csv"
+        write-output "`"Contains only absolute silences`",$recording" | out-file -filepath "${dir}recordings_to_do_manually.csv" -encoding "ascii" -append
         $silence_start = "END UNSUCCESSFUL LOOP"
         }
       }
@@ -92,7 +94,7 @@ foreach ($recording in $allrecordings)
     # Create a log of which time stamps for the silences that were used for the file
     # for the purpose of quality control (i.e., listening to the silences manually
     # to see if they were good)
-    write-output "$recording,$silence_start,$silence_end" >> "${dir}time_stamps_used.csv"
+    write-output "$recording,$silence_start,$silence_end" | out-file -filepath "${dir}time_stamps_used.csv" -encoding "ascii" -append
 
     # Use SoX to apply noise reduction. You can comment this out and replace it
     # with code to apply noise reduction with other software if you wish.
@@ -104,7 +106,7 @@ foreach ($recording in $allrecordings)
   else
     {
     # Add filename to log to do manually
-    write-output "`"Failed to find normal silence`",$recording" >> "${dir}recordings_to_do_manually.csv"
+    write-output "`"Failed to find normal silence`",$recording" | out-file -filepath "${dir}recordings_to_do_manually.csv" -encoding "ascii" -append
     }
   }
 

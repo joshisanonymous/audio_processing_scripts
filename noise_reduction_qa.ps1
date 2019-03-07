@@ -67,7 +67,7 @@ while ($groupsindex -lt $files_and_stamps.matches.groups.count)
   $end_time = $files_and_stamps.matches.groups[$groupsindex + 2].value
 
   # Save the results to a csv file
-  write-output "$file,$start_time,$end_time,$acceptability,`"$comment`"" >> time_stamps_checked.csv
+  write-output "$file,$start_time,$end_time,$acceptability,`"$comment`"" | out-file -filepath "time_stamps_checked.csv" -encoding "ascii" -append
 
   # Move to the next set of matches
   $groupsindex = $groupsindex + 4
