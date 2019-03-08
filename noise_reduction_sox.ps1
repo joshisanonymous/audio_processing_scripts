@@ -12,4 +12,4 @@ sox $dir$recording ${dir}normal_silence.$ext trim $silence_start =$silence_end
 sox ${dir}normal_silence.$ext -n noiseprof ${dir}temp.noise-profile
 
 # Apply noise reduction to the recording using the noise profile
-sox $dir$recording ${dir}cleaned_$recording noisered ${dir}temp.noise-profile 0.3
+sox $dir$recording ${dir}cleaned_$recording noisered ${dir}temp.noise-profile $reduction_value

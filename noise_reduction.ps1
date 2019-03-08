@@ -26,12 +26,15 @@ $dir = read-host "----`nWhere are your recordings located (e.g., `".\`" for the 
 $ext = read-host "----`nWhat is the file extension of the recordings you're working with (e.g., `"wav`")"
 
 # Prompt the user for thresholds and durations to consider as absolute silence
-$abs_thres = read-host "----`nBelow what amplitude ratio should silence be considered absolute?`nLower may increase the number of recordings that can have noise reduction`napplied automatically but will increase the ris of having it applied poorly,`nand vice versa. The default is 0.01"
+$abs_thres = read-host "----`nBelow what amplitude ratio should silence be considered absolute?`nLower may increase the number of recordings that can have noise reduction`napplied automatically but will increase the risk of having it applied poorly,`nand vice versa. The default is 0.01"
 $abs_dur = read-host "----`nHow many seconds should absolute silence last before it is considered absolute?`nShorter may increase the number of recordings that can have noise reduction`napplied automatically but will increase the risk of having it applied poorly,`nand vice versa. The default is 1"
 
 # Prompt the user for thresholds and durations to consider as normal silence
 $norm_thres = read-host "----`nBelow what amplitude ratio should sound be considered normal silence?`nGood values can vary greatly between recordings. The default is 0.1"
 $norm_dur = read-host "----`nHow many seconds should normal silence last before it is considered silence?`nShorter may increase the number of recordings that can have noise reduction`napplied automatically but will increase the risk of having it applied poorly,`nand vice versa. The default is 1"
+
+# Prompt the user for how much noise reduction to apply
+$reduction_value = read-host "----`nHow much noise reduction do you want to apply?`nValues range from 0 to 1. Higher values risk creating unnatural sound,`nLower values risk not having an impact. The default is 0.3"
 
 # Get a list of recordings
 $allrecordings = get-childitem -name "$dir*.$ext"
