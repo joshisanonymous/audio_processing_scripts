@@ -10,7 +10,7 @@
 # the value at the end of the line, ranging from 0.0 to 1.0 where 1.0 is more        #
 # reduction and 0.0 is less.                                                         #
 #                                                                                    #
-# -Joshua McNeill (joshua.mcneill at uga.edu)                                        #
+# -Joshua McNeill (joshua dot mcneill at uga dot edu)                                #
 #                                                                                    #
 # Dependencies: FFmpeg, SoX                                                          #
 #                                                                                    #
@@ -67,10 +67,15 @@ foreach ($recording in $allrecordings)
     $silence_start = $normal_silence_starts.matches.groups[$groupsindex].value
     $silence_end = $normal_silence_ends.matches.groups[$groupsindex].value
 
+    # Create a truncated version of $silence_start to be used in the while loop.
+    # This ensures that time stamps that are different by fractions of a second
+    # are still captured.
+    $silence_start_truncated = [math]::truncate($silence_start)
+
     # Verify that the first normal silence matches are not absolute silence and
     # loop through the matches until either a non-absolute silence is found or
     # otherwise all matches have been checked
-    while ($absolute_silence_check -like "*$silence_start*")
+    while (($absolute_silence_check -like "$silence_start_truncated.") -or ($absolute_silence_check -like "$($silence_start_truncated + 1)."))
       {
       # Moves on to the second normal silence time stamp, because, as per the while test,
       # the first was an absolute silence.
@@ -79,6 +84,10 @@ foreach ($recording in $allrecordings)
         {
         $silence_start = $normal_silence_starts.matches.groups[$groupsindex].value
         $silence_end = $normal_silence_ends.matches.groups[$groupsindex].value
+
+        # Truncate the new value for $silence_start for testing in the while loop
+        # condition.
+        $silence_start_truncated = [math]::truncate($silence_start)
         }
       else
         {
