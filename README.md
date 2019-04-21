@@ -1,4 +1,6 @@
-# speech_noise_reduction
-This is a simple set of PowerShell scripts that apply SoX noise reduction to many recordings of speech at once.
+This repo contains various scripts used to perform (usually batch) audio
+processing, each directory representing a different project. Scripts are
+in whichever language I was playing with at the time or that seemed
+appropriate.
 
-The one you would run is noise_reduction.ps1. Further details are in the comments of the scripts.
+* noise_reduction: Uses FFmpeg and SoX to batch apply noise reduction
