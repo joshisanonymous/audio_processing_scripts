@@ -10,11 +10,13 @@
 #
 # -Joshua McNeill, joshua dot mcneill at uga dot edu
 
+echo "Please wait..."
+
 for file in $@
 do
   # Save the current file's SNR to $snr
   snr=`snr_calculator.exe -num_chans 1 -input $file |
-  awk '{ printf("%s", $5) }'`
+       awk '{ printf("%s", $5) }'`
 
   # Save just the filename from $file to $filename (in cases where a path was used)
   if [[ $file =~ /([^/]*)$ ]]
